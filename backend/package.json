@@ -1,10 +1,7 @@
 {
   "name": "moodmate-backend",
   "version": "1.0.0",
-<<<<<<< HEAD
   "description": "MoodMate Backend Server",
-=======
->>>>>>> 164f2dbe4966f80001e429a793383e9e6f88c246
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
