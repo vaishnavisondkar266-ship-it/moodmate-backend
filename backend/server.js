@@ -128,6 +128,10 @@ app.get("/api/entries", (req, res) => {
 app.get("/", (req, res) => {
   res.send("MoodMate Backend Running Successfully 🚀");
 });
+// ROOT ROUTE (VERY IMPORTANT)
+app.get("/", (req, res) => {
+  res.status(200).send("MoodMate Backend Running Successfully 🚀");
+});
 // ---------------- START SERVER ----------------
 // ---------------- START SERVER ----------------
 const PORT = process.env.PORT || 8080;
