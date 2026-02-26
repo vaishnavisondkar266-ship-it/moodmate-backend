@@ -8,7 +8,6 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ Use dynamic port for Render
-const PORT = process.env.PORT || 5000;
 
 // ✅ Use absolute path for SQLite (important for hosting)
 const dbPath = path.join(__dirname, "moodmate.db");
