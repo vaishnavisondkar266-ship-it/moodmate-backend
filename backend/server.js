@@ -4,23 +4,29 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// ✅ Use dynamic port for Render
+/* =========================
+   DATABASE SETUP
+========================= */
 
-// ✅ Use absolute path for SQLite (important for hosting)
 const dbPath = path.join(__dirname, "moodmate.db");
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error(err.message);
+    console.error("Database connection error:", err.message);
   } else {
     console.log("Connected to SQLite database");
   }
 });
 
-// ---------------- USERS TABLE ----------------
+/* =========================
+   TABLES
+========================= */
+
+// Users table
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,13 +37,13 @@ db.run(`
   )
 `);
 
-// Insert default admin
+// Default admin
 db.run(
   "INSERT OR IGNORE INTO users (name,email,password,role) VALUES (?,?,?,?)",
   ["Admin", "admin@gmail.com", "1234", "admin"]
 );
 
-// ---------------- ENTRIES TABLE ----------------
+// Entries table
 db.run(`
   CREATE TABLE IF NOT EXISTS entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,7 +53,16 @@ db.run(`
   )
 `);
 
-// ---------------- REGISTER ----------------
+/* =========================
+   ROUTES
+========================= */
+
+// Root Route (VERY IMPORTANT)
+app.get("/", (req, res) => {
+  res.status(200).send("MoodMate Backend Running Successfully 🚀");
+});
+
+// Register
 app.post("/api/register", (req, res) => {
   const { name, email, password } = req.body;
 
@@ -56,9 +71,7 @@ app.post("/api/register", (req, res) => {
     [name, email, password, "user"],
     function (err) {
       if (err) {
-        return res.status(400).json({
-          error: "User already exists",
-        });
+        return res.status(400).json({ error: "User already exists" });
       }
 
       res.json({
@@ -69,7 +82,7 @@ app.post("/api/register", (req, res) => {
   );
 });
 
-// ---------------- LOGIN ----------------
+// Login
 app.post("/api/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -82,9 +95,7 @@ app.post("/api/login", (req, res) => {
       }
 
       if (!user) {
-        return res.status(401).json({
-          message: "Invalid credentials",
-        });
+        return res.status(401).json({ message: "Invalid credentials" });
       }
 
       res.json({
@@ -96,7 +107,7 @@ app.post("/api/login", (req, res) => {
   );
 });
 
-// ---------------- SAVE ENTRY ----------------
+// Save Entry
 app.post("/api/entries", (req, res) => {
   const { mood, sleep, journal } = req.body;
 
@@ -113,7 +124,7 @@ app.post("/api/entries", (req, res) => {
   );
 });
 
-// ---------------- GET ENTRIES ----------------
+// Get Entries
 app.get("/api/entries", (req, res) => {
   db.all("SELECT * FROM entries ORDER BY id DESC", [], (err, rows) => {
     if (err) {
@@ -124,18 +135,12 @@ app.get("/api/entries", (req, res) => {
   });
 });
 
-// ---------------- ROOT ROUTE (IMPORTANT FOR RENDER) ----------------
-app.get("/", (req, res) => {
-  res.send("MoodMate Backend Running Successfully 🚀");
-});
-// ROOT ROUTE (VERY IMPORTANT)
-app.get("/", (req, res) => {
-  res.status(200).send("MoodMate Backend Running Successfully 🚀");
-});
-// ---------------- START SERVER ----------------
-// ---------------- START SERVER ----------------
+/* =========================
+   SERVER START (Railway Fix)
+========================= */
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log("Server running on port " + PORT);
 });
