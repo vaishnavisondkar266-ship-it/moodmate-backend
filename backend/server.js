@@ -129,8 +129,9 @@ app.get("/api/entries", (req, res) => {
 app.get("/", (req, res) => {
   res.send("MoodMate Backend Running Successfully 🚀");
 });
-
 // ---------------- START SERVER ----------------
+const PORT = process.env.PORT || 8080;
+
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
