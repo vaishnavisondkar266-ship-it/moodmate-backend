@@ -59,7 +59,10 @@ app.get("/", (req, res) => {
   res.status(200).send("MoodMate Backend Running Successfully 🚀");
 });
 
-// Register
+/* =========================
+   REGISTER USER
+========================= */
+
 app.post("/api/register", (req, res) => {
   const { name, email, password } = req.body;
 
@@ -79,12 +82,15 @@ app.post("/api/register", (req, res) => {
   );
 });
 
-// Login
-app.post("/api/login", (req, res) => {
+/* =========================
+   USER LOGIN
+========================= */
+
+app.post("/api/user-login", (req, res) => {
   const { email, password } = req.body;
 
   db.get(
-    "SELECT * FROM users WHERE email=? AND password=?",
+    "SELECT * FROM users WHERE email=? AND password=? AND role='user'",
     [email, password],
     (err, user) => {
       if (err) {
@@ -92,19 +98,51 @@ app.post("/api/login", (req, res) => {
       }
 
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Invalid user credentials" });
       }
 
       res.json({
-        message: "Login success",
+        message: "User login successful",
         role: user.role,
         userId: user.id,
+        name: user.name
       });
     }
   );
 });
 
-// Save Entry
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+app.post("/api/admin-login", (req, res) => {
+  const { email, password } = req.body;
+
+  db.get(
+    "SELECT * FROM users WHERE email=? AND password=? AND role='admin'",
+    [email, password],
+    (err, admin) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (!admin) {
+        return res.status(401).json({ message: "Invalid admin credentials" });
+      }
+
+      res.json({
+        message: "Admin login successful",
+        role: admin.role,
+        adminId: admin.id
+      });
+    }
+  );
+});
+
+/* =========================
+   SAVE ENTRY
+========================= */
+
 app.post("/api/entries", (req, res) => {
   const { mood, sleep, journal } = req.body;
 
@@ -121,7 +159,10 @@ app.post("/api/entries", (req, res) => {
   );
 });
 
-// Get Entries
+/* =========================
+   GET ENTRIES
+========================= */
+
 app.get("/api/entries", (req, res) => {
   db.all("SELECT * FROM entries ORDER BY id DESC", [], (err, rows) => {
     if (err) {
@@ -136,7 +177,7 @@ app.get("/api/entries", (req, res) => {
    SERVER START
 ========================= */
 
-const PORT = process.env.PORT || 5000;   // ✅ FIXED
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Server running on port " + PORT);
